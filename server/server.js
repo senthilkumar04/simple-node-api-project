@@ -84,15 +84,15 @@ app.patch('/note/:id', (req, res) => {
     }
 
     Note.findByIdAndUpdate(id, { $set: body }, { new: true })
-    .then((note) => {
-        if(!note){
-            return res.status(404).send();
-        }
-        res.send(note);
-    })
-    .catch((error) => {
-        return res.status(400).send();
-    })
+        .then((note) => {
+            if (!note) {
+                return res.status(404).send();
+            }
+            res.send(note);
+        })
+        .catch((error) => {
+            return res.status(400).send();
+        })
 });
 
 app.post("/users", (req, res) => {
