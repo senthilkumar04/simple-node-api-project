@@ -211,4 +211,34 @@ describe("POST /users", () => {
         .expect(400)
         .end(done);
     })
+});
+
+describe("POST /users/login", ()=>{
+    it("should login user and return auth token", (done)=>{
+        request(app)
+        .post("/users/login")
+        .send({
+            email: users[1].email,
+            password : users[1].password
+        })
+        .expect(200)
+        .expect((res)=>{
+            expect(res.body.email).toBe(users[1].email);
+            expect(res.headers['x-auth']).toExist();
+        })
+        .end(done);
+    })
+    it("should reject invalid user", (done)=>{
+        request(app)
+        .post("/users/login")
+        .send({
+            email: users[1].email,
+            password : "asdf"
+        })
+        .expect(400)
+         .expect((res)=>{
+            expect(res.headers['x-auth']).toNotExist();
+        })
+        .end(done);
+    })
 })
