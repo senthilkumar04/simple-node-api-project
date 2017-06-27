@@ -104,3 +104,49 @@ describe("DELETE /note/:id", () => {
         .end(done);
     })
 });
+
+describe("PATCH /note/:id", () => {
+    it("Should update expected note", (done) => {
+        var updatedNote = {
+            title : "Updated note title",
+            description : "Updated desc"
+        };
+        request(app)
+        .patch(`/note/${notes[0]._id.toHexString()}`)
+        .send(updatedNote)
+        .expect(200)
+        .expect((res)=>{
+            expect(res.body.title).toBeA('string').toBe(updatedNote.title);
+        })
+        .end(done);
+    });
+    it("Should return 400 as the request is not correct", (done) => {
+        var updatedNote = {
+            name : "Updated note title",
+            body : "Updated desc"
+        };
+        request(app)
+        .patch(`/note/${notes[0]._id.toHexString()}`)
+        .send(updatedNote)
+        .expect(400)
+        .end(done);
+    });
+    it("Should return 400 for non object id", (done) => {
+        request(app)
+        .patch("/note/1234")
+        .send({})
+        .expect(400)
+        .end(done);
+    });
+    it("Should return 404 if object id is not found", (done) => {
+        var updatedNote = {
+            title : "Updated note title",
+            description : "Updated desc"
+        };
+        request(app)
+        .patch(`/note/${new ObjectID().toHexString()}`)
+        .send(updatedNote)
+        .expect(404)
+        .end(done);
+    });
+});

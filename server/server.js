@@ -1,6 +1,7 @@
-var express = require('express');
-var bodyParser = require('body-parser');
-var { ObjectID } = require('mongodb');
+const _ = require('lodash');
+const express = require('express');
+const bodyParser = require('body-parser');
+const { ObjectID } = require('mongodb');
 
 var { mongoose } = require('./db/mongoose');
 var { Note } = require('./models/note');
@@ -33,15 +34,15 @@ app.get('/notes', (req, res) => {
 
 app.get('/note/:id', (req, res) => {
     var id = req.params.id;
-    if(ObjectID.isValid(id)){
-        Note.findById(id).then((response)=>{
-            if(response){
+    if (ObjectID.isValid(id)) {
+        Note.findById(id).then((response) => {
+            if (response) {
                 res.send(response);
             }
             else {
                 res.status(404).send();
             }
-        }, (error)=>{
+        }, (error) => {
             res.status(400).send();
         });
     }
@@ -52,21 +53,44 @@ app.get('/note/:id', (req, res) => {
 
 app.delete('/note/:id', (req, res) => {
     var id = req.params.id;
-    if(ObjectID.isValid(id)){
-        Note.findByIdAndRemove(id).then((response)=>{
-            if(response){
+    if (ObjectID.isValid(id)) {
+        Note.findByIdAndRemove(id).then((response) => {
+            if (response) {
                 res.send(response);
             }
             else {
                 res.status(404).send();
             }
-        }, (error)=>{
+        }, (error) => {
             res.status(400).send();
         });
     }
     else {
         res.status(400).send();
     }
+});
+
+app.patch('/note/:id', (req, res) => {
+    var id = req.params.id;
+    var body = _.pick(req.body, ['title', 'description']);
+
+    if (!ObjectID.isValid(id)) {
+        return res.status(400).send();
+    }
+    if (!(body.title || body.description)) {
+        return res.status(400).send();
+    }
+
+    Note.findByIdAndUpdate(id, { $set: body }, { new: true })
+    .then((note) => {
+        if(!note){
+            return res.status(404).send();
+        }
+        res.send(note);
+    })
+    .catch((error) => {
+        return res.status(400).send();
+    })
 });
 
 app.listen(port, () => {
