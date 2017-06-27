@@ -50,6 +50,25 @@ app.get('/note/:id', (req, res) => {
     }
 });
 
+app.delete('/note/:id', (req, res) => {
+    var id = req.params.id;
+    if(ObjectID.isValid(id)){
+        Note.findByIdAndRemove(id).then((response)=>{
+            if(response){
+                res.send(response);
+            }
+            else {
+                res.status(404).send();
+            }
+        }, (error)=>{
+            res.status(400).send();
+        });
+    }
+    else {
+        res.status(400).send();
+    }
+});
+
 app.listen(port, () => {
     console.log(`Server is started on port ${port}`);
 });

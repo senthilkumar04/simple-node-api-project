@@ -80,3 +80,27 @@ describe("GET /note/:id", () => {
         .end(done);
     })
 });
+
+describe("DELETE /note/:id", () => {
+    it("Should remove expected note", (done) => {
+        request(app)
+        .delete(`/note/${notes[0]._id.toHexString()}`)
+        .expect(200)
+        .expect((res)=>{
+            expect(res.body.title).toBeA('string').toBe(notes[0].title);
+        })
+        .end(done);
+    })
+    it("Should return 400 for non object id", (done) => {
+        request(app)
+        .delete("/note/1234")
+        .expect(400)
+        .end(done);
+    })
+    it("Should return 404 id object id is not found", (done) => {
+        request(app)
+        .delete(`/note/${new ObjectID().toHexString()}`)
+        .expect(404)
+        .end(done);
+    })
+});
