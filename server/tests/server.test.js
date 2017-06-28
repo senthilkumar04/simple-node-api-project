@@ -58,6 +58,13 @@ describe("GET /note/:id", () => {
             })
             .end(done);
     })
+    it("Should not return note created by others", (done) => {
+        request(app)
+            .get(`/note/${notes[2]._id.toHexString()}`)
+            .set('x-auth', users[0].tokens[0].token)
+            .expect(404)
+            .end(done);
+    })
     it("Should return 400 for non object id", (done) => {
         request(app)
             .get("/note/1234")
@@ -78,21 +85,31 @@ describe("DELETE /note/:id", () => {
     it("Should remove expected note", (done) => {
         request(app)
             .delete(`/note/${notes[0]._id.toHexString()}`)
+            .set('x-auth', users[0].tokens[0].token)
             .expect(200)
             .expect((res) => {
                 expect(res.body.title).toBeA('string').toBe(notes[0].title);
             })
             .end(done);
     })
+    it("Should not delete note created by others", (done) => {
+        request(app)
+            .get(`/note/${notes[2]._id.toHexString()}`)
+            .set('x-auth', users[0].tokens[0].token)
+            .expect(404)
+            .end(done);
+    })
     it("Should return 400 for non object id", (done) => {
         request(app)
             .delete("/note/1234")
+            .set('x-auth', users[0].tokens[0].token)
             .expect(400)
             .end(done);
     })
     it("Should return 404 id object id is not found", (done) => {
         request(app)
             .delete(`/note/${new ObjectID().toHexString()}`)
+            .set('x-auth', users[0].tokens[0].token)
             .expect(404)
             .end(done);
     })
@@ -106,11 +123,24 @@ describe("PATCH /note/:id", () => {
         };
         request(app)
             .patch(`/note/${notes[0]._id.toHexString()}`)
+            .set('x-auth', users[0].tokens[0].token)
             .send(updatedNote)
             .expect(200)
             .expect((res) => {
                 expect(res.body.title).toBeA('string').toBe(updatedNote.title);
             })
+            .end(done);
+    });
+    it("Should note update note created by others", (done) => {
+        var updatedNote = {
+            title: "Updated note title",
+            description: "Updated desc"
+        };
+        request(app)
+            .patch(`/note/${notes[2]._id.toHexString()}`)
+            .set('x-auth', users[0].tokens[0].token)
+            .send(updatedNote)
+            .expect(404)
             .end(done);
     });
     it("Should return 400 as the request is not correct", (done) => {
@@ -120,6 +150,7 @@ describe("PATCH /note/:id", () => {
         };
         request(app)
             .patch(`/note/${notes[0]._id.toHexString()}`)
+            .set('x-auth', users[0].tokens[0].token)
             .send(updatedNote)
             .expect(400)
             .end(done);
@@ -127,6 +158,7 @@ describe("PATCH /note/:id", () => {
     it("Should return 400 for non object id", (done) => {
         request(app)
             .patch("/note/1234")
+            .set('x-auth', users[0].tokens[0].token)
             .send({})
             .expect(400)
             .end(done);
@@ -138,6 +170,7 @@ describe("PATCH /note/:id", () => {
         };
         request(app)
             .patch(`/note/${new ObjectID().toHexString()}`)
+            .set('x-auth', users[0].tokens[0].token)
             .send(updatedNote)
             .expect(404)
             .end(done);

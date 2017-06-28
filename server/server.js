@@ -37,10 +37,13 @@ app.get('/notes', authenticate, (req, res) => {
     })
 });
 
-app.get('/note/:id', (req, res) => {
+app.get('/note/:id', authenticate, (req, res) => {
     var id = req.params.id;
     if (ObjectID.isValid(id)) {
-        Note.findById(id).then((response) => {
+        Note.findOne({
+            _id: id,
+            _creator : req.user._id
+        }).then((response) => {
             if (response) {
                 res.send(response);
             }
@@ -56,10 +59,13 @@ app.get('/note/:id', (req, res) => {
     }
 });
 
-app.delete('/note/:id', (req, res) => {
+app.delete('/note/:id', authenticate, (req, res) => {
     var id = req.params.id;
     if (ObjectID.isValid(id)) {
-        Note.findByIdAndRemove(id).then((response) => {
+        Note.findOneAndRemove({
+            _id : id,
+            _creator : req.user._id
+        }).then((response) => {
             if (response) {
                 res.send(response);
             }
@@ -75,7 +81,7 @@ app.delete('/note/:id', (req, res) => {
     }
 });
 
-app.patch('/note/:id', (req, res) => {
+app.patch('/note/:id', authenticate, (req, res) => {
     var id = req.params.id;
     var body = _.pick(req.body, ['title', 'description']);
 
@@ -86,7 +92,10 @@ app.patch('/note/:id', (req, res) => {
         return res.status(400).send();
     }
 
-    Note.findByIdAndUpdate(id, { $set: body }, { new: true })
+    Note.findOneAndUpdate({
+        _id: id,
+        _creator : req.user._id
+    }, { $set: body }, { new: true })
         .then((note) => {
             if (!note) {
                 return res.status(404).send();
