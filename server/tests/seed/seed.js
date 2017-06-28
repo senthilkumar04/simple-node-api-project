@@ -3,23 +3,6 @@ const jwt = require('jsonwebtoken');
 const { Note } = require('./../../models/note');
 const { User } = require('./../../models/user');
 
-const notes = [{
-    _id: new ObjectID(),
-    title: "Note Test 1"
-}, {
-    _id: new ObjectID(),
-    title: "Note Test 2"
-}, {
-    _id: new ObjectID(),
-    title: "Note Test 3"
-}];
-
-const populateNotes = (done) => {
-    Note.remove({}).then(() => {
-        return Note.insertMany(notes);
-    }).then(() => done());
-}
-
 const userOneId = new ObjectID();
 const userTwoId = new ObjectID();
 
@@ -42,6 +25,26 @@ const populateUsers = (done) => {
         var userOne = new User(users[0]).save();
         var userTwo = new User(users[1]).save();
         return Promise.all([userOne, userTwo]);
+    }).then(() => done());
+}
+
+const notes = [{
+    _id: new ObjectID(),
+    title: "Note Test 1",
+    _creator : userOneId
+}, {
+    _id: new ObjectID(),
+    title: "Note Test 2",
+    _creator : userOneId
+}, {
+    _id: new ObjectID(),
+    title: "Note Test 3",
+    _creator : userTwoId
+}];
+
+const populateNotes = (done) => {
+    Note.remove({}).then(() => {
+        return Note.insertMany(notes);
     }).then(() => done());
 }
 

@@ -14,10 +14,11 @@ var port = process.env.PORT;
 
 app.use(bodyParser.json());
 
-app.post('/notes', (req, res) => {
+app.post('/notes', authenticate, (req, res) => {
     var newNote = new Note({
         title: req.body.title,
-        description: req.body.description
+        description: req.body.description,
+        _creator: req.user._id
     });
     newNote.save().then((response) => {
         res.send(response);
@@ -26,8 +27,10 @@ app.post('/notes', (req, res) => {
     })
 });
 
-app.get('/notes', (req, res) => {
-    Note.find().then((response) => {
+app.get('/notes', authenticate, (req, res) => {
+    Note.find({
+        _creator : req.user._id
+    }).then((response) => {
         res.send({ notes: response });
     }, (error) => {
         res.status(400).send(error);

@@ -10,6 +10,10 @@ var Note = mongoose.model('Note', {
     description: {
         type: String,
         default: 'Note description goes here'
+    },
+    _creator : {
+        type: mongoose.Schema.Types.ObjectId,
+        required: true
     }
 });
 

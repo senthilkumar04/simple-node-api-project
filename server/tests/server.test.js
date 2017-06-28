@@ -15,6 +15,7 @@ describe("POST /notes", () => {
         var title = "New Note to be added"
         request(app)
             .post("/notes")
+            .set('x-auth', users[0].tokens[0].token)
             .send({ title })
             .expect(200)
             .expect((res) => {
@@ -26,6 +27,7 @@ describe("POST /notes", () => {
         var title = ""
         request(app)
             .post("/notes")
+            .set('x-auth', users[0].tokens[0].token)
             .send({})
             .expect(400)
             .end(done);
@@ -36,9 +38,10 @@ describe("GET /notes", () => {
     it("Should get all notes", (done) => {
         request(app)
             .get("/notes")
+            .set('x-auth', users[0].tokens[0].token)
             .expect(200)
             .expect((res) => {
-                expect(res.body.notes.length).toBe(3);
+                expect(res.body.notes.length).toBe(2);
             })
             .end(done);
     })
@@ -48,6 +51,7 @@ describe("GET /note/:id", () => {
     it("Should return expected note", (done) => {
         request(app)
             .get(`/note/${notes[0]._id.toHexString()}`)
+            .set('x-auth', users[0].tokens[0].token)
             .expect(200)
             .expect((res) => {
                 expect(res.body.title).toBeA('string').toBe(notes[0].title);
@@ -57,12 +61,14 @@ describe("GET /note/:id", () => {
     it("Should return 400 for non object id", (done) => {
         request(app)
             .get("/note/1234")
+            .set('x-auth', users[0].tokens[0].token)
             .expect(400)
             .end(done);
     })
     it("Should return 404 id object id is not found", (done) => {
         request(app)
             .get(`/note/${new ObjectID().toHexString()}`)
+            .set('x-auth', users[0].tokens[0].token)
             .expect(404)
             .end(done);
     })
